@@ -125,10 +125,72 @@ const getUserTweets = asyncHandler(async (req, res) => {
 
 const updateTweet = asyncHandler(async (req, res) => {
   //TODO: update tweet
+
+  const { tweetId } = req.params;
+  const { content } = req.body;
+
+  // Validate tweetId
+  if (!isValidObjectId(tweetId)) {
+    throw new ApiError(400, "Invalid tweet ID");
+  }
+
+  if (!content || content.trim().length === 0) {
+    throw new ApiError(400, "Please provide some content");
+  }
+
+  const user = await User.findById(req.user?._id);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const tweet = await Tweet.findById(tweetId);
+  if (!tweet) {
+    throw new ApiError(404, "Tweet not found");
+  }
+
+  // Check if comment belongs to authenticated user
+  if (tweet.owner.toString() !== req.user?._id.toString()) {
+    throw new ApiError(403, "You are not authorized to update this tweet");
+  }
+
+  const updatedTweet = await Tweet.findByIdAndUpdate(
+    tweetId,
+    { content: content.trim() },
+    { new: true }
+  ).populate("owner", "username fullname avatar");
+
+  return res.status(200).json(200, updatedTweet, "Tweet updated successfully");
 });
 
 const deleteTweet = asyncHandler(async (req, res) => {
   //TODO: delete tweet
+
+  const { tweetId } = req.params;
+  // Validate tweetId
+  if (!isValidObjectId(tweetId)) {
+    throw new ApiError(400, "Invalid tweet ID");
+  }
+
+  const user = await User.findById(req.user?._id);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const tweet = await Tweet.findById(tweetId);
+  if (!tweet) {
+    throw new ApiError(404, "Tweet not found");
+  }
+
+  // Check if comment belongs to authenticated user
+  if (tweet.owner.toString() !== req.user?._id.toString()) {
+    throw new ApiError(403, "You are not authorized to delet this tweet");
+  }
+
+  await Tweet.findByIdAndDelete(tweetId);
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Tweet deleted successfully"));
 });
 
 export { createTweet, getUserTweets, updateTweet, deleteTweet };
