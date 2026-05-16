@@ -278,7 +278,7 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid video id");
   }
 
-  const user = User.findById(req.user?._id);
+  const user = await User.findById(req.user?._id);
   if (!user) {
     throw new ApiError(404, "User not found");
   }
