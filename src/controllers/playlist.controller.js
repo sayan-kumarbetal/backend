@@ -60,7 +60,7 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
   const limit = parseInt(req.query.limit) || 10;
   const skip = (page - 1) * limit;
 
-  const playlists = await Playlist.aggregate([
+  const playlists = await PlayList.aggregate([
     {
       $match: {
         owner: new mongoose.Types.ObjectId(userId),
@@ -101,7 +101,7 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
   ]);
 
   // Get total count for pagination
-  const totalPlaylists = await Playlist.countDocuments({ owner: userId });
+  const totalPlaylists = await PlayList.countDocuments({ owner: userId });
 
   return res.status(200).json(
     new ApiResponse(
@@ -111,7 +111,7 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
         user: {
           _id: user._id,
           username: user.username,
-          fullName: user.fullName,
+          fullName: user.fullname,
           avatar: user.avatar,
         },
         pagination: {
@@ -134,7 +134,7 @@ const getPlaylistById = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid PlaylistId");
   }
 
-  const playlist = await Playlist.aggregate([
+  const playlist = await PlayList.aggregate([
     {
       $match: {
         _id: new mongoose.Types.ObjectId(playlistId),
@@ -233,7 +233,7 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User not found");
   }
 
-  const playlist = await Playlist.findById(playlistId);
+  const playlist = await PlayList.findById(playlistId);
   if (!playlist) {
     throw new ApiError(404, "Playlist not found");
   }
@@ -253,7 +253,7 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Video is already in the playlist");
   }
 
-  const updatedPlaylist = await Playlist.findByIdAndUpdate(
+  const updatedPlaylist = await PlayList.findByIdAndUpdate(
     playlistId,
     { $push: { videos: videoId } },
     { new: true }
@@ -283,7 +283,7 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User not found");
   }
 
-  const playlist = await Playlist.findById(playlistId);
+  const playlist = await PlayList.findById(playlistId);
   if (!playlist) {
     throw new ApiError(404, "Playlist not found");
   }
@@ -304,7 +304,7 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
   }
 
   // Remove video from playlist
-  const updatedPlaylist = await Playlist.findByIdAndUpdate(
+  const updatedPlaylist = await PlayList.findByIdAndUpdate(
     playlistId,
     { $pull: { videos: videoId } },
     { new: true }
@@ -334,7 +334,7 @@ const deletePlaylist = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User not found");
   }
 
-  const playlist = await Playlist.findById(playlistId);
+  const playlist = await PlayList.findById(playlistId);
   if (!playlist) {
     throw new ApiError(404, "Playlist not found");
   }
@@ -344,7 +344,7 @@ const deletePlaylist = asyncHandler(async (req, res) => {
     throw new ApiError(403, "You are not authorized to delete this playlist");
   }
 
-  await Playlist.findByIdAndDelete(playlistId);
+  await PlayList.findByIdAndDelete(playlistId);
 
   return res
     .status(200)
@@ -363,12 +363,12 @@ const updatePlaylist = asyncHandler(async (req, res) => {
   if (!name && !description) {
     throw new ApiError(400, "At least name or description is required");
   }
-  const user = User.findById(req.user?._id);
+  const user = await User.findById(req.user?._id);
   if (!user) {
     throw new ApiError(404, "User not found");
   }
 
-  const playlist = await Playlist.findById(playlistId);
+  const playlist = await PlayList.findById(playlistId);
   if (!playlist) {
     throw new ApiError(404, "Playlist not found");
   }
@@ -383,15 +383,17 @@ const updatePlaylist = asyncHandler(async (req, res) => {
   if (name) updateFields.name = name.trim();
   if (description !== undefined) updateFields.description = description.trim();
 
-  const updatedPlaylist = await Playlist.findByIdAndUpdate(
+  const updatedPlaylist = await PlayList.findByIdAndUpdate(
     playlistId,
     { $set: updateFields },
     { new: true }
   ).populate("owner", "username fullname avatar");
 
-  return res.status(
-    new ApiResponse(200, updatedPlaylist, "Playlist updated successfully")
-  );
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, updatedPlaylist, "Playlist updated successfully")
+    );
 });
 
 export {
