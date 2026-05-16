@@ -23,6 +23,7 @@ import videosRouter from "./routes/video.routes.js";
 import commentsRouter from "./routes/comment.routes.js";
 import likesRouter from "./routes/comment.routes.js";
 import tweetsRouter from "./routes/comment.routes.js";
+import playListRouter from "./routes/playlist.routes.js";
 
 //routes declaration
 app.use("/api/v1/users", userRouter);
@@ -30,5 +31,6 @@ app.use("/api/v1/videos", videosRouter);
 app.use("/api/v1/comments", commentsRouter);
 app.use("/api/v1/likes", likesRouter);
 app.use("/api/v1/tweets", tweetsRouter);
+app.use("api/v1/playlists", playListRouter);
 
 export { app };
