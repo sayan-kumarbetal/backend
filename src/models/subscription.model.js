@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { User } from "./user.mdel";
+import { User } from "./user.model.js";
 
 const subsciptionSchema = new Schema(
   {
@@ -15,4 +15,4 @@ const subsciptionSchema = new Schema(
   { timestamps: true }
 );
 
-export const Subsciption = mongoose.model("Subsciption", subsciptionSchema);
+export const Subscription = mongoose.model("Subsciption", subsciptionSchema);
