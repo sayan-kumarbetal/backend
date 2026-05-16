@@ -10,7 +10,7 @@ const createPlaylist = asyncHandler(async (req, res) => {
   const { name, description } = req.body;
   //TODO: create playlist
 
-  if (!name || !name.trim().length === 0) {
+  if (!name || name.trim().length === 0) {
     throw new ApiError(400, "Name is required required");
   }
 
@@ -19,7 +19,7 @@ const createPlaylist = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User not found");
   }
 
-  const playlist = await Playlist.create({
+  const playlist = await PlayList.create({
     name: name.trim(),
     description: description?.trim() || "",
     owner: req.user?._id,
@@ -30,7 +30,7 @@ const createPlaylist = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Faild to create Playlist");
   }
 
-  const createdPlaylist = await Playlist.findById(playlist._id).populate(
+  const createdPlaylist = await PlayList.findById(playlist._id).populate(
     "owner",
     "username fullname avatar"
   );
