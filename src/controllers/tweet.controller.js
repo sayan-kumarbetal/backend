@@ -35,7 +35,7 @@ const createTweet = asyncHandler(async (req, res) => {
   );
 
   return res
-    .ststus(200)
+    .status(200)
     .json(new ApiResponse(200, createTweet, "Tweet created sucessfully"));
 });
 
@@ -158,6 +158,7 @@ const updateTweet = asyncHandler(async (req, res) => {
     { content: content.trim() },
     { new: true }
   ).populate("owner", "username fullname avatar");
+  // console.log(updatedTweet);
 
   return res.status(200).json(200, updatedTweet, "Tweet updated successfully");
 });

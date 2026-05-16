@@ -78,7 +78,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
       $lookup: {
         from: "users",
         localField: "subscriber",
-        foreginField: "_id",
+        foreignField: "_id",
         as: "subscriberDetails",
         pipeline: [
           {
@@ -126,7 +126,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
         channel: {
           _id: channel._id,
           username: channel.username,
-          fullName: channel.fullName,
+          fullName: channel.fullname,
           avatar: channel.avatar,
         },
         pagination: {
